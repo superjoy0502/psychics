@@ -60,17 +60,26 @@ internal object CommandPsychic {
                     }
                 }
             }
+            then("detach") {
+                then("player" to player()) {
+                    executes {
+                        detach(it.sender, it.parseArgument("player"))
+                    }
+                }
+            }
             then("info") {
+                require { this is Player }
                 then("psychic" to PsychicConceptArgument) {
-                    require { this is Player }
                     executes {
                         info(it.sender as Player, it.parseArgument("psychic"))
                     }
                 }
-                require { this is Player && requireNotNull(manager.getEsper(this)).psychic != null }
                 executes {
                     val sender = it.sender as Player
-                    info(sender, manager.getEsper(sender)!!.psychic!!.concept)
+                    val psychic = manager.getEsper(sender)?.psychic
+
+                    if (psychic == null) sender.sendMessage("능력이 없습니다.")
+                    else info(sender, psychic.concept)
                 }
             }
             then("supply") {
@@ -79,7 +88,6 @@ internal object CommandPsychic {
                     supply(it.sender as Player)
                 }
                 then("ability" to AbilityConceptArgument) {
-                    require { this is Player }
                     executes {
                         supply(it.sender as Player, it.parseArgument("ability"))
                     }
@@ -95,6 +103,11 @@ internal object CommandPsychic {
     private fun attach(sender: CommandSender, player: Player, psychicConcept: PsychicConcept) {
         requireNotNull(manager.getEsper(player)).attachPsychic(psychicConcept).isEnabled = true
         sender.sendFeedback("${player.name}'s ability = ${psychicConcept.name}")
+    }
+
+    private fun detach(sender: CommandSender, player: Player) {
+        player.esper.detachPsychic()
+        sender.sendFeedback("${player.name}'s ability = NONE")
     }
 
     private fun supply(sender: Player) {

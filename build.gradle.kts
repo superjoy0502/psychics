@@ -42,7 +42,7 @@ subprojects {
         compileOnly("com.github.noonmaru:invfx:1.3.0")
 
         implementationOnlyCommon("com.github.noonmaru:tap:3.1.7")
-        implementationOnlyCommon("com.github.noonmaru:kommand:0.4.0")
+        implementationOnlyCommon("com.github.noonmaru:kommand:0.5.0")
 
         testImplementation("junit:junit:4.13")
         testImplementation("org.mockito:mockito-core:3.3.3")
@@ -82,6 +82,9 @@ subprojects {
                 relocate("com.github.noonmaru.kommand", "com.github.noonmaru.psychics.kommand")
             }
         }
+        assemble {
+            dependsOn(shadowJar)
+        }
     }
 }
 
@@ -89,4 +92,4 @@ project(":psychics-common") {
     apply(plugin = "maven-publish")
 }
 
-gradle.buildFinished { project.buildDir.deleteRecursively() }
+gradle.buildFinished { buildDir.deleteRecursively() }
